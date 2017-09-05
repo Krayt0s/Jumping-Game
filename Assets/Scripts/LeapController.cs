@@ -23,7 +23,7 @@ public class LeapController : MonoBehaviour {
 
     private float lastAIH;
 
-    private GameObject landObject;
+    private List<GameObject> landObjects = new List<GameObject>();
 
     private bool charging {
         get { return _charging; }
@@ -86,6 +86,7 @@ public class LeapController : MonoBehaviour {
     private void Ground(GameObject ground) {
         grounding = ground.AddComponent<RelativeJoint2D>();
         grounding.connectedBody = rb2d;
+        grounding.enableCollision = true;
         grounded = true;
     }
 
@@ -97,16 +98,17 @@ public class LeapController : MonoBehaviour {
 
     private void Land() {
         rb2d.velocity = Vector2.zero;
-        if (landObject == null) {
+        if (landObjects.Count == 0) {
             Lose();
         } else {
-            Ground(landObject);
+            Ground(landObjects[0]);
             anim.SetTrigger("Land");
         }
     }
 
     private void Lose() {
-        Destroy(gameObject);
+        gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+        //Destroy(gameObject);
     }
 
     void OnCollisionEnter2D(Collision2D coll) {
@@ -115,13 +117,11 @@ public class LeapController : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D coll) {
         if(coll.gameObject.layer == LayerMask.NameToLayer("Landable")) {
-            landObject = coll.gameObject;
+            landObjects.Add(coll.gameObject);
         }
     }
 
     void OnTriggerExit2D(Collider2D coll) {
-        if(coll.gameObject == landObject) {
-            landObject = null;
-        }
+        landObjects.Remove(coll.gameObject);
     }
 }
