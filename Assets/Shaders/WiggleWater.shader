@@ -1,12 +1,17 @@
-﻿Shader "Custom/GrabPassInvert"
+﻿Shader "Custom/WigglyWater"
 {
 	Properties {
-		_FlowSpeed("Speed", Float) = 1
-		_FreqPerp("Perpendicular Wave Frequency", Float) = 20
-		_FreqPar("Parallel Wave Frequency", Float) = 40
-		_WavelengthPerp("Perpendicular Wavelength", Range(0.01, 1)) = 0.5
-		_WavelengthPar("Parallel Wavelength", Range(0.01, 1)) = 0.5
-		_Refraction("Refraction", Range(0, 1)) = 0.2
+		// Not actually used, just for surpressing warnings.
+		_MainTex("Required Texture for SpriteRenderer ???", 2D) = "white" {}
+
+		_FreqPerp("Frequency X", Float) = 20
+		_WavesX("# Waves X", Float) = 5
+		_FreqPar("Frequency Y", Float) = 40
+		_WavesY("# Waves Y", Float) = 5
+
+		_Refraction("Refraction", Range(0, 0.3)) = 0.2
+		_WaveCol("Wave Colour", Color) = (1, 1, 1, 1)
+	    _WCP("Wave Colour %", Range(0, 1)) = 0.3
 	}
 	SubShader
 	{
@@ -16,7 +21,7 @@
 		// Grab the screen behind the object into _BackgroundTexture
 		GrabPass
 	    {
-		"_BackgroundTexture"
+		    "_BackgroundTexture"
      	}
 
 		// Render the object with the texture generated above, and invert the colors
@@ -45,24 +50,29 @@
 	        }
 	        
 	        sampler2D _BackgroundTexture;
-			float _FlowSpeed;
 			float _FreqPerp;
 			float _FreqPar;
 			float _Refraction;
-			float _WavelengthPerp;
-			float _WavelengthPar;
+			float _WavesX;
+			float _WavesY;
+			float _WCP;
+			fixed4 _WaveCol;
 	        
 	        half4 frag(v2f i) : SV_Target
 	        {
-				float unused;
-			    float xWave = sin((i.grabPos.x / _WavelengthPerp + _Time.x * _FlowSpeed) * _FreqPerp) * _Refraction;
-			    float yWave = sin((i.grabPos.y / _WavelengthPar + _Time.x * _FlowSpeed) * _FreqPar) * _Refraction;
-				float2 disp = float2(xWave, yWave);
+			    float px = (i.grabPos.x + sin(i.grabPos.y * 20) / 50) * _WavesX;
+				float py = (i.grabPos.y + sin(i.grabPos.x * 20) / 50) * _WavesY;
+			    float xWave = sin(px + _Time.x * _FreqPerp);
+			    float yWave = sin(py + _Time.x * _FreqPar);
 
-				float newX = modf(i.grabPos.x + disp.x, unused);
-				float newY = modf(i.grabPos.y + disp.y, unused);
+				float rim = ((xWave + yWave) / 2) * _WCP;
+				float2 disp = float2(xWave, yWave) * _Refraction;
+
+				float newX = clamp(i.grabPos.x + disp.x, 0, 1);
+				float newY = clamp(i.grabPos.y + disp.y, 0, 1);
 				
-				float4 col = tex2D(_BackgroundTexture, float2(newX, newY)) / 2;
+				float4 col = tex2D(_BackgroundTexture, float2(newX, newY));
+				col = (rim * _WaveCol) + ((1 - rim) * col);
 				return col;
 	        }
 	    	ENDCG
