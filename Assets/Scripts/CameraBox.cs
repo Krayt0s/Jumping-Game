@@ -7,7 +7,7 @@ public class CameraBox : MonoBehaviour {
     /* Camera Unity Height Units = Camera_Size
      * Camera Unity Width Units  = Camera_Size * (visWidth / visHeight)
      */
-    public const float visWidth = 6f;
+    public const float visWidth = 6.5f;
     public const float visHeight = 5f;
 
     private Camera cam;
@@ -36,24 +36,20 @@ public class CameraBox : MonoBehaviour {
     }
 
     void AdjustScreen() {
-        float windowAspect = Screen.width / Screen.height;
-        float targetAspect = visWidth / visHeight;
-        float aspectScale = windowAspect / targetAspect;
-
-        if(aspectScale < 1.0f) {
+        float scale = Screen.height / visHeight;
+        float scaledWidth = visWidth * scale;
+        if(scaledWidth <= Screen.width) {
             // Shorter / Wider Resolution, showing too much width
-            float scale = Screen.height / visHeight;
-            float scaledWidth = visWidth * scale;
             float visRatio = scaledWidth / Screen.width;       
             cam.rect = new Rect((1.0f - visRatio) / 2.0f, 0f, 
-                                 visRatio, 1.0f);
-        } else {            
+                                    visRatio, 1.0f);
+        } else {
             // Taller / Thinner Resolution, showing too much height
-            float scale = Screen.width / visWidth;
+            scale = Screen.width / visWidth;
             float scaledHeight = visHeight * scale;
-            float visRatio = scaledHeight / Screen.width;
-            cam.rect = new Rect(0f, (1.0f - visRatio) / 2.0f, 
-                                1.0f, visRatio);
+            float visRatio = scaledHeight / Screen.height;
+            cam.rect = new Rect(0f, (1.0f - visRatio) / 2.0f,
+                                    1.0f, visRatio);
         }
     }
 }
