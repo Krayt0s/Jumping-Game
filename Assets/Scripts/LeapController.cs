@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(LandingController))]
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Animator))]
 public class LeapController : MonoBehaviour {
     /** The Gameobject must have a trigger that acts as a landing spot sensor **/
+    private LandingController lc;
     private Rigidbody2D rb2d;
     private Animator anim;
 
@@ -18,12 +20,7 @@ public class LeapController : MonoBehaviour {
     private float heldTime;
     private const float maxHoldTime = 1.5f;
 
-    private bool grounded = true;
-    private Joint2D grounding;
-
     private float lastAIH;
-
-    private List<GameObject> landObjects = new List<GameObject>();
 
     private bool charging {
         get { return _charging; }
@@ -36,13 +33,14 @@ public class LeapController : MonoBehaviour {
     void Awake() {
         heldTime = 0f;
         jumpVelocity = maxJumpDistance / fallTime;
+        lc = GetComponent<LandingController>();
         rb2d = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
     }
 	
 	// Update is called once per frame
 	void Update () {
-        if(grounded) {
+        if (lc.grounded) {
             if(charging) {
                 if (Input.GetButton("Jump")) {
                     heldTime += Time.deltaTime;
@@ -52,18 +50,22 @@ public class LeapController : MonoBehaviour {
                     }
                 } else if (Input.GetButtonUp("Jump")) {
                     Jump((heldTime / maxHoldTime) * jumpVelocity);
-                    heldTime = 0;
-                    charging = false;
+                    Uncharge();
                     Invoke("Land", fallTime);
                 }
-           } else {
-               if (Input.GetButtonDown("Jump")) {
+            } else {
+                if (Input.GetButtonDown("Jump")) {
                    charging = true;
-               }
+                }
             }
         }
 
         Rotate();
+    }
+
+    private void Uncharge() {
+        heldTime = 0;
+        charging = false;
     }
 
     private void Rotate() {
@@ -76,33 +78,17 @@ public class LeapController : MonoBehaviour {
         lastAIH = aih;
     }
 
-    private void Unground() {
-        if(grounding) {
-            Destroy(grounding);
-        }
-        grounded = false;
-    }
-
-    private void Ground(GameObject ground) {
-        grounding = ground.AddComponent<RelativeJoint2D>();
-        grounding.connectedBody = rb2d;
-        grounding.enableCollision = true;
-        grounded = true;
-    }
-
     private void Jump(float jumpStrength) {
         rb2d.velocity += jumpStrength * (Vector2)transform.up;
-        Unground();
+        lc.Unground();
         anim.SetTrigger("Jump");
     }
 
     private void Land() {
-        rb2d.velocity = Vector2.zero;
-        if (landObjects.Count == 0) {
-            Lose();
-        } else {
-            Ground(landObjects[0]);
+        if(lc.Land()) {
             anim.SetTrigger("Land");
+        } else {
+            lc.Sink();
         }
     }
 
@@ -112,16 +98,6 @@ public class LeapController : MonoBehaviour {
     }
 
     void OnCollisionEnter2D(Collision2D coll) {
-        Unground();
-    }
-
-    void OnTriggerEnter2D(Collider2D coll) {
-        if(coll.gameObject.layer == LayerMask.NameToLayer("Landable")) {
-            landObjects.Add(coll.gameObject);
-        }
-    }
-
-    void OnTriggerExit2D(Collider2D coll) {
-        landObjects.Remove(coll.gameObject);
+        Uncharge();
     }
 }
