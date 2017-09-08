@@ -10,26 +10,10 @@ public class RepeatSpawner : MonoBehaviour {
     public bool randomAngle;
     public Vector2[] possibleVelocities;
 
-    public Vector2[] wayPoints;
-    public float speed;
-    private int marker;
-
     // Use this for initialization
     void Start () {
         StartCoroutine("SpawnLoop");
 	}
-
-    void Update() {
-        if(wayPoints.Length == 0) {
-            return;
-        }
-
-        Vector3 dir = (wayPoints[marker] - (Vector2)transform.position);
-        transform.position += dir * speed * Time.deltaTime;
-        if((wayPoints[marker] - (Vector2)transform.position).magnitude < 0.3) {
-            marker = (marker + 1) % wayPoints.Length;
-        }
-    }
 
     private IEnumerator SpawnLoop() {
         while(true) {
