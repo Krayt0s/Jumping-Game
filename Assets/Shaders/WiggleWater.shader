@@ -4,12 +4,11 @@
 		// Not actually used, just for surpressing warnings.
 		_MainTex("Required Texture for SpriteRenderer ???", 2D) = "white" {}
 
-		_FreqPerp("Frequency X", Float) = 20
-		_WavesX("# Waves X", Float) = 5
-		_FreqPar("Frequency Y", Float) = 40
-		_WavesY("# Waves Y", Float) = 5
+	    _Direction("Wave Direction | Shape", Vector) = (0,1,-1,0)
+		_Freq("Frequency", Float) = 40
+		_Waves("# Waves", Float) = 5
 
-		_Refraction("Refraction", Range(0, 0.3)) = 0.2
+		_Refraction("Refraction", Range(0, 0.2)) = 0.2
 		_WaveCol("Wave Colour", Color) = (1, 1, 1, 1)
 	    _WCP("Wave Colour %", Range(0, 1)) = 0.3
 	}
@@ -50,23 +49,22 @@
 	        }
 	        
 	        sampler2D _BackgroundTexture;
-			float _FreqPerp;
-			float _FreqPar;
+			fixed4 _Direction;
 			float _Refraction;
-			float _WavesX;
-			float _WavesY;
+			fixed _Freq;
+			fixed _Waves;
 			float _WCP;
 			fixed4 _WaveCol;
 	        
 	        half4 frag(v2f i) : SV_Target
 	        {
-			    float px = (i.grabPos.x + sin(i.grabPos.y * 20) / 50) * _WavesX;
-				float py = (i.grabPos.y + sin(i.grabPos.x * 20) / 50) * _WavesY;
-			    float xWave = sin(px + _Time.x * _FreqPerp);
-			    float yWave = sin(py + _Time.x * _FreqPar);
+				float perp = dot(i.grabPos.xy, _Direction.zw);
+				float par = dot(i.grabPos.xy, _Direction.xy);
+				float px = (par + sin(perp * 20) / 50) * _Waves;
 
-				float rim = ((xWave + yWave) / 2) * _WCP;
-				float2 disp = float2(xWave, yWave) * _Refraction;
+				float z = sin(px + _Time.x * _Freq);
+				float2 disp = _Direction * -z * _Refraction;
+				float rim = (z + 1) * _WCP;
 
 				float newX = clamp(i.grabPos.x + disp.x, 0, 1);
 				float newY = clamp(i.grabPos.y + disp.y, 0, 1);
