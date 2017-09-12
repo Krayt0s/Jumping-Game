@@ -17,16 +17,13 @@
 	}
 	SubShader
 	{
-		// Draw ourselves after all opaque geometry
 		Tags{ "Queue" = "Transparent" }
 
-		// Grab the screen behind the object into _BackgroundTexture
 		GrabPass
 	    {
 		    "_BackgroundTexture"
      	}
 
-		// Render the object with the texture generated above, and invert the colors
 		Pass
 	    {
 		    CGPROGRAM
@@ -41,17 +38,17 @@
 				float3 info : TEXCOORD1;
 	        };
 	        
+			static const float TAU = 2 * 3.14159265f;
 			fixed _Freq;
+			fixed _TileX;
+			fixed _TileY;
 
 	        v2f vert(appdata_base v) {
 	        	v2f o;
 	        	o.pos = UnityObjectToClipPos(v.vertex);
 	        	o.grabPos = ComputeGrabScreenPos(o.pos);
 
-				float3 wpos = mul(UNITY_MATRIX_M, v.vertex).xyz;
-
-				o.info.x = wpos.x;
-				o.info.y = wpos.y;
+				o.info.xy = mul(UNITY_MATRIX_M, v.vertex).xy / float2(_TileX, _TileY);
 				o.info.z = _Time.y * _Freq;
 	        	return o;
 	        }
@@ -60,27 +57,29 @@
 			fixed4 _Direction;
 			float _Refraction;
 			fixed _Waves;
-			fixed _TileX;
-			fixed _TileY;
 			float _WCP;
 			fixed4 _WaveCol;
 	        
 	        half4 frag(v2f i) : SV_Target
 	        {
 				fixed _;
-				float2 xy = float2(i.info.x, i.info.y);
-				xy.x = modf(i.info.x / _TileX, _);
-				xy.y = modf(i.info.y / _TileY, _);
+				// TAU ensures continuous trig functions, i.e. seamless waves
+				float2 xy = float2(modf(i.info.x, _), modf(i.info.y, _)) * TAU;
 
 				float perp = dot(xy, _Direction.zw);
 				float par = dot(xy, _Direction.xy);
-				float pz = (par + sin(perp * 20) / 50) * _Waves;
+				float pz = ((par) + sin(perp * 20) / 50) * _Waves;
 
 				float z = sin(pz + i.info.z);
 				float2 disp = _Direction * -z * _Refraction;
 				float rim = (z + 1) / 2 * _WCP;
+
+				//TODO inline variable
+				float2 uv = i.grabPos.xy + disp.xy;
+				//uv.x = clamp(uv.x, 0, 1);
+				//uv.y = clamp(uv.y, 0, 1);
 				
-				float4 col = tex2D(_BackgroundTexture, i.grabPos.xy + disp.xy);
+				float4 col = tex2D(_BackgroundTexture, uv.xy);
 				col = lerp(col, _WaveCol, rim);
 				return col;
 	        }
