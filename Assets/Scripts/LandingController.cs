@@ -6,7 +6,8 @@ using UnityEngine;
 public class LandingController : MonoBehaviour {
     private SpriteRenderer[] srs;
     private Color[] cols;
-    private int sinkOffset = 500;
+    private const int sinkOffset = 500;
+    private const float sinkScale = 0.8f;
 
     private Rigidbody2D rb2d;
 
@@ -67,8 +68,8 @@ public class LandingController : MonoBehaviour {
 
     public void Sink() {
         state = State.SUBMERGED;
-
-        transform.localScale *= 0.8f;
+        
+        transform.localScale *= sinkScale;
         Instantiate(splashParticleSystem, transform.position, Quaternion.identity);
         AudioSource.PlayClipAtPoint(splashSound, transform.position);
         for (int i = 0; i < srs.Length; i++) {
@@ -80,7 +81,7 @@ public class LandingController : MonoBehaviour {
     }
 
     public void Surface() {
-        transform.localScale /= 0.8f;
+        transform.localScale /= sinkScale;
         for (int i = 0; i < srs.Length; i++) {
             srs[i].color = cols[i];
             srs[i].sortingOrder += sinkOffset;
