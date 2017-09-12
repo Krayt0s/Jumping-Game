@@ -18,13 +18,19 @@ public class Collector : MonoBehaviour {
             return;
         }
 
+        var tag = coll.gameObject.tag;
+
         if(lc.submerged) {
             // Nothing yet is collectable underwater
         } else {
-            if (true) {
-                Destroy(coll.gameObject);
-                AudioSource.PlayClipAtPoint(eatSound, transform.position);
-                points++;
+            switch (tag) {
+                case "Fly":
+                    Destroy(coll.gameObject);
+                    AudioSource.PlayClipAtPoint(eatSound, transform.position);
+                    points++;
+                    break;
+                default:
+                    break;
             }
         }
     }
