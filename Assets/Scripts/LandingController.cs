@@ -55,7 +55,7 @@ public class LandingController : MonoBehaviour {
         state = State.GROUNDED;
     }
 
-    public bool Land() {
+    public bool CanLand() {
         rb2d.velocity = Vector2.zero;
         if (landObjects.Count == 0) {
             return false;
