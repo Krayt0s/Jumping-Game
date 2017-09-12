@@ -13,8 +13,8 @@ public class FrogController : MonoBehaviour {
     private AudioSource asrc;
 
     public AudioClip chargeSound;
-    private float startPitch = 0.0f;
-    private float endPitch = 3.0f;
+    private float startPitch = 0.1f;
+    private float endPitch = 2.5f;
     private float volume = 0.3f;
 
     public float turnSpeed = 420.0f;
