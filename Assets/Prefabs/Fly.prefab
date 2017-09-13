@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 95793520372210844}
   - component: {fileID: 114730197486307566}
   - component: {fileID: 50573353557786712}
+  - component: {fileID: 114933377364021560}
   m_Layer: 12
   m_Name: Fly
   m_TagString: Fly
@@ -112,6 +113,17 @@ MonoBehaviour:
   wanderMax: 4
   recallDist: 5
   speed: 0.6
+--- !u!114 &114933377364021560
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1905068981015244}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3bc6e5da8aec45d44abcf8fd7306f7d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!212 &212854810840026754
 SpriteRenderer:
   m_ObjectHideFlags: 1
