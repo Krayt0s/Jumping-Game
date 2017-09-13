@@ -49,7 +49,7 @@ public class FrogController : MonoBehaviour {
 	void Update () {
         if(charging) {
             if (ReleaseCharge()) {
-                if (lc.grounded || lc.CanLand()) {
+                if (lc.grounded || (lc.airborne && lc.CanLand())) {
                     Jump((heldTime / maxHoldTime) * jumpVelocity);
                 }
                 Uncharge();
@@ -61,8 +61,7 @@ public class FrogController : MonoBehaviour {
                 asrc.PlayOneShot(chargeSound, volume);
                 heldTime += Time.deltaTime;
                 if (heldTime > maxHoldTime) {
-                    charging = false;
-                    heldTime = 0;
+                    Uncharge();
                 }
             }
         } else {
@@ -87,6 +86,13 @@ public class FrogController : MonoBehaviour {
 
     private void Uncharge() {
         heldTime = 0;
+        if(charging) {
+            if (asrc.isPlaying) {
+                asrc.Stop();
+            }
+            asrc.pitch = Mathf.Lerp(startPitch, endPitch, 0.1f);
+            asrc.PlayOneShot(chargeSound, volume);
+        }
         charging = false;
     }
 
