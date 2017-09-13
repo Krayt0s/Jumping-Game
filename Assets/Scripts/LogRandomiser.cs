@@ -9,7 +9,7 @@ public class LogRandomiser : MonoBehaviour {
     public Vector2 lengthSizes;
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
         Vector2 randSize = new Vector2(
             Random.Range(widthSizes.x, widthSizes.y), 
             Random.Range(lengthSizes.x, lengthSizes.y));

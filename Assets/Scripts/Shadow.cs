@@ -12,19 +12,18 @@ public class Shadow : MonoBehaviour {
     private Vector2 offset = new Vector2(0.3f, -0.3f);
     private GameObject shadow;
 
-    void Start() {
-        Invoke("LateStart", 0.1f);
-    }
+    private SpriteRenderer sr;
+    private SpriteRenderer srorg;
 
-    void LateStart () {
+    void Start () {
         shadow = new GameObject("Shadow");
         Vector3 shadowScale = transform.localScale;
         shadowScale.x *= shadowScaleX;
         shadowScale.y *= shadowScaleY;
         shadow.transform.localScale = shadowScale;
 
-        var srorg = GetComponent<SpriteRenderer>();
-        var sr = shadow.AddComponent<SpriteRenderer>();
+        srorg = GetComponent<SpriteRenderer>();
+        sr = shadow.AddComponent<SpriteRenderer>();
         // Copy all data
         sr.sprite = srorg.sprite;
         sr.drawMode = srorg.drawMode;
@@ -42,5 +41,10 @@ public class Shadow : MonoBehaviour {
     void LateUpdate() {
         shadow.transform.position = transform.position + (Vector3)offset;
         shadow.transform.rotation = transform.rotation;
+        sr.sprite = srorg.sprite;
+    }
+
+    void OnDestroy() {
+        Destroy(shadow);
     }
 }
