@@ -15,7 +15,7 @@ public class LandingController : MonoBehaviour {
     public GameObject splashParticleSystem;
     public AudioClip splashSound;
 
-    private Joint2D grounding;
+    private AnchoredJoint2D grounding;
 
     private List<GameObject> landObjects = new List<GameObject>();
 
@@ -50,7 +50,9 @@ public class LandingController : MonoBehaviour {
     }
 
     private void Ground(GameObject ground) {
-        grounding = ground.AddComponent<RelativeJoint2D>();
+        grounding = ground.AddComponent<HingeJoint2D>();
+        Quaternion invrot = Quaternion.Inverse(ground.transform.rotation);
+        grounding.anchor = invrot * (transform.position - ground.transform.position);
         grounding.connectedBody = rb2d;
         grounding.enableCollision = true;
         state = State.GROUNDED;
@@ -100,5 +102,9 @@ public class LandingController : MonoBehaviour {
 
     void OnTriggerExit2D(Collider2D coll) {
         landObjects.Remove(coll.gameObject);
+
+        if(grounded && !CanLand()) {
+            Sink();
+        }
     }
 }

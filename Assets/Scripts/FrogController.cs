@@ -45,9 +45,10 @@ public class FrogController : MonoBehaviour {
         asrc = GetComponent<AudioSource>();
     }
 	
-	// Update is called once per frame
 	void Update () {
-        if(charging) {
+        Rotate();
+
+        if (charging) {
             if (ReleaseCharge()) {
                 if (lc.grounded || (lc.airborne && lc.CanLand())) {
                     Jump((heldTime / maxHoldTime) * jumpVelocity);
@@ -80,8 +81,6 @@ public class FrogController : MonoBehaviour {
                 }
             }
         }
-
-        Rotate();
     }
 
     private void Uncharge() {
@@ -103,38 +102,23 @@ public class FrogController : MonoBehaviour {
         fallTimer = fallTime;
     }
 
-    private void Lose() {
-        gameObject.GetComponent<SpriteRenderer>().color = Color.red;
-        //Destroy(gameObject);
-    }
-
     void OnCollisionEnter2D(Collision2D coll) {
         Uncharge();
     }
 
     // --- Input Controls Implementation
-
-    //private float lastAIH;
+    
     private void Rotate() {
-        //float ih = Input.GetAxis("Horizontal");
-        //float aih = Mathf.Abs(ih);
-        //if (aih > lastAIH || aih == 1f) {
-        //    float rotation = Time.deltaTime * turnSpeed * -Mathf.Sign(ih);
-        //    transform.Rotate(new Vector3(0, 0, rotation));
-        //}
-        //lastAIH = aih;
         Vector3 dir = Input.mousePosition - Camera.main.WorldToScreenPoint(transform.position);
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.AngleAxis(angle - 90, Vector3.forward);
     }
 
     private bool BeginCharge() {
-        //return Input.GetButtonDown("Jump");
         return Input.GetButtonDown("Fire1");
     }
 
     private bool ReleaseCharge() {
-        //return Input.GetButtonUp("Jump");
         return Input.GetButtonUp("Fire1");
     }
 }
