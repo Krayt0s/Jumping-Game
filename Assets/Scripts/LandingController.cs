@@ -63,9 +63,12 @@ public class LandingController : MonoBehaviour {
         if (landObjects.Count == 0) {
             return false;
         } else {
-            Ground(landObjects[0]);
             return true;
         }
+    }
+
+    public void Land() {
+        Ground(landObjects[0]);
     }
 
     public void Sink() {

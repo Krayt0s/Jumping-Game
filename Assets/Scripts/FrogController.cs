@@ -76,6 +76,7 @@ public class FrogController : MonoBehaviour {
             if(fallTimer <= 0) {
                 if (lc.CanLand()) {
                     anim.SetTrigger("Land");
+                    lc.Land();
                 } else {
                     lc.Sink();
                 }
