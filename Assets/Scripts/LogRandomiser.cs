@@ -19,5 +19,8 @@ public class LogRandomiser : MonoBehaviour {
 
         var bc2d = GetComponent<BoxCollider2D>();
         bc2d.size = randSize - new Vector2(0.1f, 0.1f);
+
+        var shadowMask = transform.Find("Shadow Mask");
+        shadowMask.localScale = bc2d.size;
 	}
 }

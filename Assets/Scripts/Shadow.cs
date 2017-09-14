@@ -4,47 +4,104 @@ using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
 public class Shadow : MonoBehaviour {
-    private const int shadowSortOrder = -800;
-    private const float shadowScaleX = 0.9f;
-    private const float shadowScaleY = 0.9f;
+    public bool overground;
 
-    private const float shadowAlpha = 0.3f;
-    private Vector2 offset = new Vector2(0.3f, -0.3f);
-    private GameObject shadow;
+    private const int overgroundShadowSortOrder =   51;
+    private const int underwaterShadowSortOrder = -800;
+    private Vector2 overgroundShadowScale = new Vector2(0.9f, 0.9f);
+    private Vector2 underwaterShadowScale = new Vector2(0.9f, 0.9f);
 
-    private SpriteRenderer sr;
+    private const float overgroundShadowAlpha = 0.3f;
+    private const float underwaterShadowAlpha = 1.0f;
+    private Vector2 overgroundOffset = new Vector2(0.07f, -0.07f);
+    private Vector2 underwaterOffset = new Vector2(0.3f, -0.3f);
+    private GameObject overgroundShadow;
+    private GameObject underwaterShadow;
+
     private SpriteRenderer srorg;
+    private SpriteRenderer overgroundsr;
+    private SpriteRenderer underwatersr;
 
     void Start () {
-        shadow = new GameObject("Shadow");
-        Vector3 shadowScale = transform.localScale;
-        shadowScale.x *= shadowScaleX;
-        shadowScale.y *= shadowScaleY;
-        shadow.transform.localScale = shadowScale;
-
+        GameObject shadowContainer = GameObject.Find("Shadow Container");
         srorg = GetComponent<SpriteRenderer>();
-        sr = shadow.AddComponent<SpriteRenderer>();
+
+        // Underwater Shadow
+        underwaterShadow = new GameObject("Underwater Shadow (" + name + ")");
+        underwaterShadow.transform.SetParent(shadowContainer.transform);
+        underwatersr = underwaterShadow.AddComponent<SpriteRenderer>();
+
+        CopySpriteRenderer(underwatersr, srorg);
+        underwatersr.sortingOrder = underwaterShadowSortOrder;
+        Color shadowCol = Color.black;
+        shadowCol.a = underwaterShadowAlpha;
+        underwatersr.color = shadowCol;
+
+        // Overground shadow
+        if(overground) {
+            overgroundShadow = new GameObject("Overground Shadow (" + name + ")");
+            overgroundShadow.transform.SetParent(shadowContainer.transform);
+            overgroundsr = overgroundShadow.AddComponent<SpriteRenderer>();
+
+            CopySpriteRenderer(overgroundsr, srorg);
+            overgroundsr.sortingOrder = overgroundShadowSortOrder;
+            shadowCol.a = overgroundShadowAlpha;
+            overgroundsr.color = shadowCol;
+
+            overgroundsr.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+
+            var lc = GetComponent<LandingController>();
+            if (lc) {
+                lc.onSink += HideOvergroundShadow;
+                lc.onSurface += ShowOvergroundShadow;
+            }
+        }
+    }
+
+    private void CopySpriteRenderer(SpriteRenderer sr, SpriteRenderer srorg) {
         // Copy all data
         sr.sprite = srorg.sprite;
         sr.drawMode = srorg.drawMode;
         sr.size = srorg.size;
         sr.tileMode = srorg.tileMode;
-
-        // Shadow data
-        sr.sortingOrder = shadowSortOrder;
-
-        Color shadowCol = Color.black;
-        shadowCol.a = shadowAlpha;
-        sr.color = Color.black;
     }
 
     void LateUpdate() {
+        if(overground) {
+            UpdateShadow(overgroundShadow, overgroundsr, overgroundOffset, overgroundShadowScale);
+        }
+        UpdateShadow(underwaterShadow, underwatersr, underwaterOffset, underwaterShadowScale);
+    }
+
+    private void UpdateShadow(GameObject shadow, SpriteRenderer sr, Vector2 offset, Vector2 shadowScale) {
         shadow.transform.position = transform.position + (Vector3)offset;
         shadow.transform.rotation = transform.rotation;
+
+        Vector3 scale = transform.localScale;
+        scale.x *= shadowScale.x;
+        scale.y *= shadowScale.y;
+        shadow.transform.localScale = scale;
+
         sr.sprite = srorg.sprite;
     }
 
     void OnDestroy() {
-        Destroy(shadow);
+        Destroy(underwaterShadow);
+        if(overground) {
+            Destroy(overgroundShadow);
+            var lc = GetComponent<LandingController>();
+            if (lc) {
+                lc.onSink -= HideOvergroundShadow;
+                lc.onSurface -= ShowOvergroundShadow;
+            }
+        }
+    }
+
+    private void HideOvergroundShadow() {
+        overgroundShadow.SetActive(false);
+    }
+
+    private void ShowOvergroundShadow() {
+        overgroundShadow.SetActive(true);
     }
 }

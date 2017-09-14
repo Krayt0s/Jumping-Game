@@ -24,6 +24,10 @@ public class LandingController : MonoBehaviour {
     public bool grounded { get { return state == State.GROUNDED; } }
     public bool submerged { get { return state == State.SUBMERGED; } }
 
+    public delegate void StateChange();
+    public event StateChange onSink;
+    public event StateChange onSurface;
+
     private enum State {
         GROUNDED,
         SUBMERGED,
@@ -72,6 +76,7 @@ public class LandingController : MonoBehaviour {
     }
 
     public void Sink() {
+        Unground();
         state = State.SUBMERGED;
         
         transform.localScale *= sinkScale;
@@ -83,6 +88,10 @@ public class LandingController : MonoBehaviour {
             
             srs[i].sortingOrder -= sinkOffset;
         }
+
+        if(onSink != null) {
+            onSink();
+        }
     }
 
     public void Surface() {
@@ -90,6 +99,10 @@ public class LandingController : MonoBehaviour {
         for (int i = 0; i < srs.Length; i++) {
             srs[i].color = cols[i];
             srs[i].sortingOrder += sinkOffset;
+        }
+
+        if(onSurface != null) {
+            onSurface();
         }
     }
 
