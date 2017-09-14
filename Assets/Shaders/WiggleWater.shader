@@ -1,8 +1,8 @@
 ﻿Shader "Custom/WigglyWater"
 {
 	Properties {
-		// Not actually used, just for surpressing warnings.
-		_MainTex("Required Texture for SpriteRenderer ???", 2D) = "white" {}
+		[HideInInspector]
+		_MainTex("I am error.", 2D) = "white" {}
 
 		_Direction("Wave Direction | Shape", Vector) = (0,1,-1,0)
 		_Freq("Frequency", Float) = 40
@@ -53,6 +53,7 @@
 	        	return o;
 	        }
 	        
+			sampler2D _MainTex;
 	        sampler2D _BackgroundTexture;
 			fixed4 _Direction;
 			float _Refraction;
@@ -73,13 +74,8 @@
 				float z = sin(pz + i.info.z);
 				float2 disp = _Direction * -z * _Refraction;
 				float rim = (z + 1) / 2 * _WCP;
-
-				//TODO inline variable
-				float2 uv = i.grabPos.xy + disp.xy;
-				//uv.x = clamp(uv.x, 0, 1);
-				//uv.y = clamp(uv.y, 0, 1);
 				
-				float4 col = tex2D(_BackgroundTexture, uv.xy);
+				float4 col = tex2D(_BackgroundTexture, i.grabPos.xy + disp.xy);
 				col = lerp(col, _WaveCol, rim);
 				return col;
 	        }
