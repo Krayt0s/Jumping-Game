@@ -2,36 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(LandingController))]
 public class Collector : MonoBehaviour {
     public AudioClip eatSound;
 
-    private LandingController lc;
-    private float points = 0;
-
-    void Awake() {
-        lc = GetComponent<LandingController>();
-    }
+    public delegate void Collect(GameObject gameObject);
+    public event Collect onCollect;
 	
 	void OnTriggerEnter2D(Collider2D coll) {
-        if(coll.gameObject.layer != LayerMask.NameToLayer("Collectable")) {
+        if(coll.gameObject.layer != LayerMask.NameToLayer("Collectable") || onCollect == null) {
             return;
         }
+        
+        var tag = coll.tag;
+        onCollect(coll.gameObject);
 
-        var tag = coll.gameObject.tag;
-
-        if(lc.submerged) {
-            // Nothing yet is collectable underwater
-        } else {
-            switch (tag) {
-                case "Fly":
-                    Destroy(coll.gameObject);
-                    AudioSource.PlayClipAtPoint(eatSound, transform.position);
-                    points++;
-                    break;
-                default:
-                    break;
-            }
+        // Tag is changed to "X" to mark for destruction
+        if(coll.tag == "X") {
+            Destroy(coll.gameObject);
         }
     }
 }
