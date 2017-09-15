@@ -331,6 +331,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   overground: 1
+  overgroundOffset: {x: 0.07, y: -0.07}
 --- !u!114 &114628911975679234
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -342,6 +343,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbbaa3f90b1abc44b3cedd346bac36f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  eatSound: {fileID: 8300000, guid: a2b842901ebd6da46b431a832f3a964b, type: 3}
   chargeSound: {fileID: 8300000, guid: a2b1d889415ca0f4e864d32a9eb3609b, type: 3}
   turnSpeed: 210
   maxJumpDistance: 8
@@ -358,6 +360,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   overground: 1
+  overgroundOffset: {x: 0.07, y: -0.07}
 --- !u!114 &114747485106466406
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -404,13 +407,13 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 110
+  m_SortingOrder: 200
   m_Sprite: {fileID: 21300000, guid: 045c84d01f2df724cbf97c7b348a0f43, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.48, y: 0.52}
+  m_Size: {x: 0.375, y: 0.40625}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
