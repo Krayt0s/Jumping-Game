@@ -13,7 +13,7 @@ public class Shadow : MonoBehaviour {
 
     private const float overgroundShadowAlpha = 0.3f;
     private const float underwaterShadowAlpha = 1.0f;
-    private Vector2 overgroundOffset = new Vector2(0.07f, -0.07f);
+    public Vector2 overgroundOffset = new Vector2(0.07f, -0.07f);
     private Vector2 underwaterOffset = new Vector2(0.3f, -0.3f);
     private GameObject overgroundShadow;
     private GameObject underwaterShadow;
@@ -28,7 +28,6 @@ public class Shadow : MonoBehaviour {
 
         // Underwater Shadow
         underwaterShadow = new GameObject("Underwater Shadow (" + name + ")");
-        underwaterShadow.transform.SetParent(shadowContainer.transform);
         underwatersr = underwaterShadow.AddComponent<SpriteRenderer>();
 
         CopySpriteRenderer(underwatersr, srorg);
@@ -37,24 +36,32 @@ public class Shadow : MonoBehaviour {
         shadowCol.a = underwaterShadowAlpha;
         underwatersr.color = shadowCol;
 
+        if(shadowContainer) {
+            underwaterShadow.transform.SetParent(shadowContainer.transform);
+        }
+
         // Overground shadow
-        if(overground) {
-            overgroundShadow = new GameObject("Overground Shadow (" + name + ")");
+        if(!overground) {
+            return;
+        }
+        overgroundShadow = new GameObject("Overground Shadow (" + name + ")");
+        overgroundsr = overgroundShadow.AddComponent<SpriteRenderer>();
+
+        CopySpriteRenderer(overgroundsr, srorg);
+        overgroundsr.sortingOrder = overgroundShadowSortOrder;
+        shadowCol.a = overgroundShadowAlpha;
+        overgroundsr.color = shadowCol;
+
+        overgroundsr.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+
+        var lc = GetComponent<LandingController>();
+        if (lc) {
+            lc.onSink += HideOvergroundShadow;
+            lc.onSurface += ShowOvergroundShadow;
+        }
+
+        if (shadowContainer) {
             overgroundShadow.transform.SetParent(shadowContainer.transform);
-            overgroundsr = overgroundShadow.AddComponent<SpriteRenderer>();
-
-            CopySpriteRenderer(overgroundsr, srorg);
-            overgroundsr.sortingOrder = overgroundShadowSortOrder;
-            shadowCol.a = overgroundShadowAlpha;
-            overgroundsr.color = shadowCol;
-
-            overgroundsr.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
-
-            var lc = GetComponent<LandingController>();
-            if (lc) {
-                lc.onSink += HideOvergroundShadow;
-                lc.onSurface += ShowOvergroundShadow;
-            }
         }
     }
 
