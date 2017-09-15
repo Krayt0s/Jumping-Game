@@ -23,7 +23,7 @@ public class RepeatSpawner : MonoBehaviour {
     }
 
     private void Spawn() {
-        var q = randomAngle ? Quaternion.Euler(0, 0, Random.Range(0, 360)) : Quaternion.identity;
+        var q = randomAngle ? Quaternion.Euler(0, 0, Random.Range(0, 360)) : prefab.transform.rotation;
         var p = Instantiate(prefab, transform.position, q);
         var rb2d = p.GetComponent<Rigidbody2D>();
         rb2d.velocity = possibleVelocities[Random.Range(0, possibleVelocities.Length)];
