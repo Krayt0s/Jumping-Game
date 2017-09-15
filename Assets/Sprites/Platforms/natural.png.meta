@@ -1,10 +1,11 @@
 fileFormatVersion: 2
 guid: 2e6314cc3db7c7c49bb50df933c873c7
-timeCreated: 1505262818
+timeCreated: 1505426035
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
     21300000: lilypad
+    21300002: lily
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -107,6 +108,20 @@ TextureImporter:
         y: 64
         width: 64
         height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: lily
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 43
+        width: 23
+        height: 19
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
