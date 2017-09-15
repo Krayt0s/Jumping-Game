@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Collector))]
 [RequireComponent(typeof(LandingController))]
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Animator))]
@@ -12,10 +13,14 @@ public class FrogController : MonoBehaviour {
     private Animator anim;
     private AudioSource asrc;
 
+    public GameObject respawnPoint;
+
+    public AudioClip eatSound;
+
     public AudioClip chargeSound;
     private float startPitch = 0.1f;
     private float endPitch = 2.5f;
-    private float volume = 0.3f;
+    private float volume = 0.6f;
 
     public float turnSpeed = 420.0f;
     public float maxJumpDistance = 8.0f;
@@ -43,6 +48,8 @@ public class FrogController : MonoBehaviour {
         rb2d = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         asrc = GetComponent<AudioSource>();
+
+        SubscribeEvents();
     }
 	
 	void Update () {
@@ -74,12 +81,7 @@ public class FrogController : MonoBehaviour {
         if(lc.airborne) {
             fallTimer -= Time.deltaTime;
             if(fallTimer <= 0) {
-                if (lc.CanLand()) {
-                    anim.SetTrigger("Land");
-                    lc.Land();
-                } else {
-                    lc.Sink();
-                }
+                lc.TryLand();
             }
         }
     }
@@ -107,8 +109,20 @@ public class FrogController : MonoBehaviour {
         Uncharge();
     }
 
-    // --- Input Controls Implementation
-    
+    private void Respawn() {
+        if(lc.submerged) {
+            lc.Surface();
+        }
+        transform.position = respawnPoint.transform.position;
+        // Give time for collision to check
+        Invoke("PostRespawn", 0.1f);
+    }
+    private void PostRespawn() {
+        lc.TryLand();
+    }
+
+    #region Control Implementation
+
     private void Rotate() {
         Vector3 dir = Input.mousePosition - Camera.main.WorldToScreenPoint(transform.position);
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
@@ -121,5 +135,42 @@ public class FrogController : MonoBehaviour {
 
     private bool ReleaseCharge() {
         return Input.GetButtonUp("Fire1");
+    }
+
+    #endregion
+
+    private void SubscribeEvents() {
+        GetComponent<Collector>().onCollect += OnCollect;
+        lc.onLand += OnLand;
+        lc.onSink += OnSink;
+    }
+
+    private void OnCollect(GameObject toCollect) {
+        switch (toCollect.tag) {
+            case "Fly":
+                AudioSource.PlayClipAtPoint(eatSound, transform.position);
+                toCollect.tag = "X";
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void OnLand() {
+        anim.SetTrigger("Land");
+        anim.ResetTrigger("Jump");
+    }
+
+    private void OnSink() {
+        if (respawnPoint) {
+            rb2d.velocity = Vector2.zero;
+            Invoke("Respawn", 0.2f);
+        }
+    }
+
+    void OnDestroy() {
+        GetComponent<Collector>().onCollect -= OnCollect;
+        lc.onLand -= OnLand;
+        lc.onSink -= OnSink;
     }
 }

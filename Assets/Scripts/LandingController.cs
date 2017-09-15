@@ -10,8 +10,7 @@ public class LandingController : MonoBehaviour {
     private const float sinkScale = 0.8f;
 
     private Rigidbody2D rb2d;
-
-    public GameObject firstGrounding;
+    
     public GameObject splashParticleSystem;
     public AudioClip splashSound;
 
@@ -19,7 +18,7 @@ public class LandingController : MonoBehaviour {
 
     private List<GameObject> landObjects = new List<GameObject>();
 
-    private State state;
+    public State state;
     public bool airborne { get { return state == State.AIRBORNE; } }
     public bool grounded { get { return state == State.GROUNDED; } }
     public bool submerged { get { return state == State.SUBMERGED; } }
@@ -27,8 +26,9 @@ public class LandingController : MonoBehaviour {
     public delegate void StateChange();
     public event StateChange onSink;
     public event StateChange onSurface;
+    public event StateChange onLand;
 
-    private enum State {
+    public enum State {
         GROUNDED,
         SUBMERGED,
         AIRBORNE
@@ -41,8 +41,20 @@ public class LandingController : MonoBehaviour {
     }
 
     void Start() {
-        if(firstGrounding) {
-            Ground(firstGrounding);
+        if (grounded) {
+            Invoke("TryLand", 0.1f);
+        }
+    }
+    public bool TryLand() {
+        if (CanLand()) {
+            Ground(landObjects[0]);
+            if(onLand != null) {
+                onLand();
+            }
+            return true;
+        } else {
+            Sink();
+            return false;
         }
     }
 
@@ -63,16 +75,11 @@ public class LandingController : MonoBehaviour {
     }
 
     public bool CanLand() {
-        rb2d.velocity = Vector2.zero;
         if (landObjects.Count == 0) {
             return false;
         } else {
             return true;
         }
-    }
-
-    public void Land() {
-        Ground(landObjects[0]);
     }
 
     public void Sink() {
