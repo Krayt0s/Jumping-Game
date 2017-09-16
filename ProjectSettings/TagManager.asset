@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Fly
   - X
+  - Secret
   layers:
   - Default
   - TransparentFX

@@ -5,7 +5,7 @@ using UnityEngine;
 public class Collector : MonoBehaviour {
     public AudioClip eatSound;
 
-    public delegate void Collect(GameObject gameObject);
+    public delegate void Collect(GameObject gameObject, string tag);
     public event Collect onCollect;
 	
 	void OnTriggerEnter2D(Collider2D coll) {
@@ -14,7 +14,7 @@ public class Collector : MonoBehaviour {
         }
         
         var tag = coll.tag;
-        onCollect(coll.gameObject);
+        onCollect(coll.gameObject, tag);
 
         // Tag is changed to "X" to mark for destruction
         if(coll.tag == "X") {

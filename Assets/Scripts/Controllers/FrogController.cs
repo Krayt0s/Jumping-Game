@@ -145,8 +145,8 @@ public class FrogController : MonoBehaviour {
         lc.onSink += OnSink;
     }
 
-    private void OnCollect(GameObject toCollect) {
-        switch (toCollect.tag) {
+    private void OnCollect(GameObject toCollect, string tag) {
+        switch (tag) {
             case "Fly":
                 AudioSource.PlayClipAtPoint(eatSound, transform.position);
                 toCollect.tag = "X";

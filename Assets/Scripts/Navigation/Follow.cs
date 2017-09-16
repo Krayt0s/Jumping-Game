@@ -8,6 +8,10 @@ public class Follow : MonoBehaviour {
     public float speed;
     public bool lockY;
     public bool lockX;
+
+    public bool bounded;
+    public Vector2 cornerBottomLeft;
+    public Vector2 cornerTopRight;
 	
 	void Update () {
         Vector2 followPos = (Vector2)target.transform.position + offset;
@@ -17,7 +21,15 @@ public class Follow : MonoBehaviour {
         if(lockX) {
             followPos.x = transform.position.x;
         }
+
         Vector3 lerpXY = Vector2.Lerp(transform.position, followPos, speed * Time.deltaTime);
-        transform.position = lerpXY + new Vector3(0f, 0f, transform.position.z);
+        Vector3 newPosition = lerpXY + new Vector3(0f, 0f, transform.position.z);
+
+        if (bounded) {
+            newPosition.x = Mathf.Clamp(newPosition.x, cornerBottomLeft.x, cornerTopRight.x);
+            newPosition.y = Mathf.Clamp(newPosition.y, cornerBottomLeft.y, cornerTopRight.y);
+        }
+
+        transform.position = newPosition;
 	}
 }

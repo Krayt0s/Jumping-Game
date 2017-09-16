@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Camera))]
-public class CameraBox : MonoBehaviour {
+public class CameraAspectEnforcer : MonoBehaviour {
     /* Camera Unity Height Units = Camera_Size
      * Camera Unity Width Units  = Camera_Size * (visWidth / visHeight)
      */
