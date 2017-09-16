@@ -10,6 +10,7 @@ public class LevelManager : MonoBehaviour {
     public delegate void OnLevelComplete();
     public event OnLevelComplete onLevelComplete;
 
+    private int secretsCollected;
     private int fliesCollected;
     private float timeElapsed;
 
@@ -39,11 +40,16 @@ public class LevelManager : MonoBehaviour {
 
     private void Temp() {
         Debug.Log("Level Complete! " + (int)timeElapsed + "s, " + 
-            "Flies collected: " + fliesCollected + "/" + toRemove.Length);
+            "Flies collected: " + fliesCollected + "/" + toRemove.Length + " " +
+            "Secrets collected: " + secretsCollected);
     }
 
     private void OnCollect(GameObject toCollect, string tag) {
         switch (tag) {
+            case "Secret":
+                secretsCollected += 1;
+                toCollect.tag = "X";
+                break;
             case "Fly":
                 // TODO change to objective & use list
                 fliesCollected += 1;

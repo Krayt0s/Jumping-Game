@@ -8,12 +8,12 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public class FrogController : MonoBehaviour {
     /** The Gameobject must have a trigger that acts as a landing spot sensor **/
+    public GameObject spawnSetEffect;
+
     private LandingController lc;
     private Rigidbody2D rb2d;
     private Animator anim;
     private AudioSource asrc;
-
-    public GameObject respawnPoint;
 
     public AudioClip eatSound;
 
@@ -32,6 +32,8 @@ public class FrogController : MonoBehaviour {
     private const float maxHoldTime = 1.5f;
 
     private float fallTimer;
+
+    private GameObject respawnPoint;
 
     private bool charging {
         get { return _charging; }
@@ -147,9 +149,24 @@ public class FrogController : MonoBehaviour {
 
     private void OnCollect(GameObject toCollect, string tag) {
         switch (tag) {
+            case "Secret":
             case "Fly":
                 AudioSource.PlayClipAtPoint(eatSound, transform.position);
                 toCollect.tag = "X";
+                break;
+            case "Lily":
+                if(toCollect == respawnPoint) {
+                    break;
+                }
+                // Restore old lily
+                if(respawnPoint) {
+                    respawnPoint.GetComponent<SpriteRenderer>().color = Color.white;
+                }
+                // Take new lily
+                respawnPoint = toCollect;
+                respawnPoint.GetComponent<SpriteRenderer>().color = new Color(1.0f, 0.4f, 0.4f, 1.0f);
+
+                Instantiate(spawnSetEffect, respawnPoint.transform.position, Quaternion.identity);
                 break;
             default:
                 break;

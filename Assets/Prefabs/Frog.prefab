@@ -343,6 +343,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fbbaa3f90b1abc44b3cedd346bac36f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnSetEffect: {fileID: 1414706251398656, guid: d46e8e526ca2bfc478aaff3eecb190aa,
+    type: 2}
   eatSound: {fileID: 8300000, guid: a2b842901ebd6da46b431a832f3a964b, type: 3}
   chargeSound: {fileID: 8300000, guid: a2b1d889415ca0f4e864d32a9eb3609b, type: 3}
   turnSpeed: 210
@@ -372,10 +374,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb9dbf8edae90d1428dfd4fd174d94c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  firstGrounding: {fileID: 0}
   splashParticleSystem: {fileID: 1657095559739854, guid: e48b2c9cd22711b48a3c99c1cbe42ee8,
     type: 2}
   splashSound: {fileID: 8300000, guid: 2d8fea58af83d2e4a97b4af32e48d41e, type: 3}
+  state: 0
 --- !u!212 &212106597386451242
 SpriteRenderer:
   m_ObjectHideFlags: 1
