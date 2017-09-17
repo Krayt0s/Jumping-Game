@@ -40,7 +40,7 @@ public class LevelManager : MonoBehaviour {
 
     private void Temp() {
         Debug.Log("Level Complete! " + (int)timeElapsed + "s, " + 
-            "Flies collected: " + fliesCollected + "/" + toRemove.Length + " " +
+            "Flies collected: " + fliesCollected + "/" + toRemove.Length + ", " +
             "Secrets collected: " + secretsCollected);
     }
 

@@ -83,6 +83,10 @@ public class LandingController : MonoBehaviour {
     }
 
     public void Sink() {
+        if (state == State.SUBMERGED) {
+            return;
+        }
+
         Unground();
         state = State.SUBMERGED;
         

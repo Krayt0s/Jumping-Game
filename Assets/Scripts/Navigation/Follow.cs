@@ -11,6 +11,7 @@ public class Follow : MonoBehaviour {
 
     public bool bounded;
     public Vector2 cornerBottomLeft;
+
     public Vector2 cornerTopRight;
 	
 	void Update () {

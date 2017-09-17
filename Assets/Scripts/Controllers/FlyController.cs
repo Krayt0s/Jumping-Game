@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class FlyController : MonoBehaviour {
-    public Vector2 homePoint;
+    public Vector2 homePointOffset;
     public float wanderMin;
     public float wanderMax;
     public float recallDist;
@@ -11,8 +11,10 @@ public class FlyController : MonoBehaviour {
     public float speed;
 
     private Vector2 targetLocation;
+    private Vector2 homePoint;
     
 	void Start () {
+        homePoint = homePointOffset + (Vector2)transform.position;
         targetLocation = homePoint;
 	}
 

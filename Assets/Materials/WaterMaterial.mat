@@ -85,7 +85,7 @@ Material:
     - _TileX: 60
     - _TileY: 60
     - _UVSec: 0
-    - _WCP: 0.04
+    - _WCP: 0.06
     - _WaveDensity: 32
     - _WaveDensityPar: 40
     - _WaveDensityPerp: 30

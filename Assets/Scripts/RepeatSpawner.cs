@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class RepeatSpawner : MonoBehaviour {
     public GameObject prefab;
+    public float initialDelay;
     public float interArrivalMin;
     public float interArrivalMax;
 
@@ -12,8 +13,12 @@ public class RepeatSpawner : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        StartCoroutine("SpawnLoop");
+        Invoke("DelayedStart", initialDelay);
 	}
+
+    private void DelayedStart() {
+        StartCoroutine("SpawnLoop");
+    }
 
     private IEnumerator SpawnLoop() {
         while(true) {

@@ -34,6 +34,7 @@ public class FrogController : MonoBehaviour {
     private float fallTimer;
 
     private GameObject respawnPoint;
+    private bool inBounds = true;
 
     private bool charging {
         get { return _charging; }
@@ -86,6 +87,18 @@ public class FrogController : MonoBehaviour {
                 lc.TryLand();
             }
         }
+
+        KeepInCameraBounds();
+    }
+
+    void KeepInCameraBounds() {
+        Vector3 vpp = Camera.main.WorldToViewportPoint(transform.position);
+        bool oob = vpp.x < 0 || 1 < vpp.x || vpp.y < 0 || 1 < vpp.y || vpp.z < 0;
+        if (inBounds && oob) {
+            lc.Sink();
+            inBounds = false;
+        }
+        inBounds = !oob;
     }
 
     private void Uncharge() {
@@ -111,7 +124,7 @@ public class FrogController : MonoBehaviour {
         Uncharge();
     }
 
-    private void Respawn() {
+    public void Respawn() {
         if(lc.submerged) {
             lc.Surface();
         }
