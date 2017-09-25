@@ -20,6 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4079756920250374}
   - component: {fileID: 212121497487730320}
+  - component: {fileID: 114589050395819294}
   m_Layer: 0
   m_Name: Water GrabPass
   m_TagString: Untagged
@@ -234,6 +235,26 @@ MonoBehaviour:
   bounded: 0
   cornerBottomLeft: {x: 0, y: 0}
   cornerTopRight: {x: 0, y: 0}
+--- !u!114 &114589050395819294
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1082911966863480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74341eec7d29a234dbb46ddb09b5800f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  frequency: 2
+  parallelDensity: 45
+  tileSize: {x: 60, y: 60}
+  refraction: 0.01
+  crestColour: {r: 0.9401623, g: 1, b: 0.5661765, a: 1}
+  crestVisibility: 0.06
+  wave2Direction: {x: -1, y: 1}
+  wave2Density: 20
+  wave2Strength: 0.9
 --- !u!114 &114618739019000686
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -258,12 +279,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 0}
   offset: {x: 0, y: 0}
-  speed: 0
+  speed: 1
   lockY: 0
   lockX: 1
   bounded: 1
   cornerBottomLeft: {x: 0, y: 0}
-  cornerTopRight: {x: 0, y: 3}
+  cornerTopRight: {x: 0, y: 8}
 --- !u!124 &124861750424882788
 Behaviour:
   m_ObjectHideFlags: 1
