@@ -4,6 +4,8 @@ using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class LandingController : MonoBehaviour {
+    public Vector2 anchorPoint;
+
     private SpriteRenderer[] srs;
     private Color[] cols;
     private const int sinkOffset = 500;
@@ -67,8 +69,9 @@ public class LandingController : MonoBehaviour {
 
     private void Ground(GameObject ground) {
         grounding = ground.AddComponent<HingeJoint2D>();
+        grounding.autoConfigureConnectedAnchor = true;
         Quaternion invrot = Quaternion.Inverse(ground.transform.rotation);
-        grounding.anchor = invrot * (transform.position - ground.transform.position);
+        grounding.anchor = invrot * ((transform.position + (Vector3)anchorPoint) - ground.transform.position);
         grounding.connectedBody = rb2d;
         grounding.enableCollision = true;
         state = State.GROUNDED;
@@ -86,6 +89,8 @@ public class LandingController : MonoBehaviour {
         if (state == State.SUBMERGED) {
             return;
         }
+        // Attempt to fix the mysterious "glass floor" bug
+        //landObjects.Clear();
 
         Unground();
         state = State.SUBMERGED;
@@ -128,10 +133,12 @@ public class LandingController : MonoBehaviour {
     }
 
     void OnTriggerExit2D(Collider2D coll) {
-        landObjects.Remove(coll.gameObject);
+        if (coll.gameObject.layer == LayerMask.NameToLayer("Landable")) {
+            landObjects.Remove(coll.gameObject);
 
-        if(grounded && !CanLand()) {
-            Sink();
+            if(grounded && !CanLand()) {
+                Sink();
+            }
         }
     }
 }

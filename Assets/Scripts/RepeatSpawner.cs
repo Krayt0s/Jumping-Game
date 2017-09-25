@@ -11,8 +11,11 @@ public class RepeatSpawner : MonoBehaviour {
     public bool randomAngle;
     public Vector2[] possibleVelocities;
 
+    private GameObject container;
+
     // Use this for initialization
     void Start () {
+        container = GameObject.Find("Spawned Container");
         Invoke("DelayedStart", initialDelay);
 	}
 
@@ -30,7 +33,14 @@ public class RepeatSpawner : MonoBehaviour {
     private void Spawn() {
         var q = randomAngle ? Quaternion.Euler(0, 0, Random.Range(0, 360)) : prefab.transform.rotation;
         var p = Instantiate(prefab, transform.position, q);
+        p.SetActive(true);
         var rb2d = p.GetComponent<Rigidbody2D>();
-        rb2d.velocity = possibleVelocities[Random.Range(0, possibleVelocities.Length)];
+        if(possibleVelocities.Length != 0) {
+            rb2d.velocity = possibleVelocities[Random.Range(0, possibleVelocities.Length)];
+        }
+
+        if(container) {
+            p.transform.SetParent(container.transform);
+        }
     }
 }
