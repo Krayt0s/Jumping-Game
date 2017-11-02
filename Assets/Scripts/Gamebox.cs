@@ -19,7 +19,7 @@ public class Gamebox : MonoBehaviour {
     }
 
     void Despawn(GameObject gameObject) {
-        // TODO pool objects
+        // TODO pool spawned objects
         Destroy(gameObject);
     }
 }

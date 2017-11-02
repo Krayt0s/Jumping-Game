@@ -8,28 +8,28 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public class FrogController : MonoBehaviour {
     /** The Gameobject must have a trigger that acts as a landing spot sensor **/
-    public GameObject spawnSetEffect;
+    [SerializeField] private GameObject spawnSetEffect;
 
     private LandingController lc;
     private Rigidbody2D rb2d;
     private Animator anim;
     private AudioSource asrc;
 
-    public AudioClip eatSound;
+    [SerializeField] private AudioClip eatSound;
 
     public AudioClip chargeSound;
     private float startPitch = 0.1f;
     private float endPitch = 2.5f;
     private float volume = 0.6f;
 
-    public float turnSpeed = 420.0f;
-    public float maxJumpDistance = 8.0f;
-    public float fallTime = 0.3f;
+    [SerializeField] private float maxJumpDistance = 8.0f;
+    [SerializeField] private float fallTime = 0.3f;
 
     private bool _charging;
     private float jumpVelocity;
     private float heldTime;
     private const float maxHoldTime = 1.5f;
+    public float ChargeRatio { get { return (heldTime / maxHoldTime); } }
 
     private float fallTimer;
 
@@ -61,7 +61,7 @@ public class FrogController : MonoBehaviour {
         if (charging) {
             if (ReleaseCharge()) {
                 if (lc.grounded || (lc.airborne && lc.CanLand())) {
-                    Jump((heldTime / maxHoldTime) * jumpVelocity);
+                    Jump();
                 }
                 Uncharge();
             } else {
@@ -113,8 +113,9 @@ public class FrogController : MonoBehaviour {
         charging = false;
     }
 
-    private void Jump(float jumpStrength) {
-        rb2d.velocity += jumpStrength * (Vector2)transform.up;
+    private void Jump() {
+        rb2d.velocity = ChargeRatio * jumpVelocity * (Vector2)transform.up 
+                        + rb2d.velocity * (lc.grounded? 1 : 0);
         lc.Unground();
         anim.SetTrigger("Jump");
         fallTimer = fallTime;
@@ -129,6 +130,7 @@ public class FrogController : MonoBehaviour {
             lc.Surface();
         }
         transform.position = respawnPoint.transform.position;
+        Instantiate(spawnSetEffect, respawnPoint.transform.position, Quaternion.identity);
         // Give time for collision to check
         Invoke("PostRespawn", 0.1f);
     }
