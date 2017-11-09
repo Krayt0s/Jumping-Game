@@ -2,18 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(LandStateController))]
 [RequireComponent(typeof(Collector))]
-[RequireComponent(typeof(LandingController))]
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Animator))]
 public class FrogController : MonoBehaviour {
     /** The Gameobject must have a trigger that acts as a landing spot sensor **/
     [SerializeField] private GameObject spawnSetEffect;
 
-    private LandingController lc;
+    private LandStateController lc;
     private Rigidbody2D rb2d;
     private Animator anim;
     private AudioSource asrc;
+    private AudioSource boingAsrc;
 
     [SerializeField] private AudioClip eatSound;
 
@@ -36,7 +37,7 @@ public class FrogController : MonoBehaviour {
     private GameObject respawnPoint;
     private bool inBounds = true;
 
-    private bool charging {
+    private bool Charging {
         get { return _charging; }
         set {
             _charging = value;
@@ -47,10 +48,12 @@ public class FrogController : MonoBehaviour {
     void Awake() {
         heldTime = 0f;
         jumpVelocity = maxJumpDistance / fallTime;
-        lc = GetComponent<LandingController>();
+        lc = GetComponent<LandStateController>();
         rb2d = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+
         asrc = GetComponent<AudioSource>();
+        boingAsrc = gameObject.AddComponent<AudioSource>();
 
         SubscribeEvents();
     }
@@ -58,18 +61,18 @@ public class FrogController : MonoBehaviour {
 	void Update () {
         Rotate();
 
-        if (charging) {
+        if (Charging) {
             if (ReleaseCharge()) {
-                if (lc.grounded || (lc.airborne && lc.CanLand())) {
+                if (lc.Grounded || (lc.Airborne && lc.CanLand())) {
                     Jump();
                 }
                 Uncharge();
             } else {
-                if(asrc.isPlaying) {
-                    asrc.Stop();
+                if(boingAsrc.isPlaying) {
+                    boingAsrc.Stop();
                 }
-                asrc.pitch = Mathf.Lerp(startPitch, endPitch, heldTime / maxHoldTime);
-                asrc.PlayOneShot(chargeSound, volume);
+                boingAsrc.pitch = Mathf.Lerp(startPitch, endPitch, heldTime / maxHoldTime);
+                boingAsrc.PlayOneShot(chargeSound, volume);
                 heldTime += Time.deltaTime;
                 if (heldTime > maxHoldTime) {
                     Uncharge();
@@ -77,14 +80,7 @@ public class FrogController : MonoBehaviour {
             }
         } else {
             if (BeginCharge()) {
-                charging = true;
-            }
-        }
-
-        if(lc.airborne) {
-            fallTimer -= Time.deltaTime;
-            if(fallTimer <= 0) {
-                lc.TryLand();
+                Charging = true;
             }
         }
 
@@ -103,22 +99,21 @@ public class FrogController : MonoBehaviour {
 
     private void Uncharge() {
         heldTime = 0;
-        if(charging) {
-            if (asrc.isPlaying) {
-                asrc.Stop();
+        if(Charging) {
+            if (boingAsrc.isPlaying) {
+                boingAsrc.Stop();
             }
-            asrc.pitch = Mathf.Lerp(startPitch, endPitch, 0.1f);
-            asrc.PlayOneShot(chargeSound, volume);
+            boingAsrc.pitch = Mathf.Lerp(startPitch, endPitch, 0.1f);
+            boingAsrc.PlayOneShot(chargeSound, volume);
         }
-        charging = false;
+        Charging = false;
     }
 
     private void Jump() {
         rb2d.velocity = ChargeRatio * jumpVelocity * (Vector2)transform.up 
-                        + rb2d.velocity * (lc.grounded? 1 : 0);
-        lc.Unground();
+                        + rb2d.velocity * (lc.Grounded? 1 : 0);
+        lc.Ascend(fallTime);
         anim.SetTrigger("Jump");
-        fallTimer = fallTime;
     }
 
     void OnCollisionEnter2D(Collision2D coll) {
@@ -126,9 +121,6 @@ public class FrogController : MonoBehaviour {
     }
 
     public void Respawn() {
-        if(lc.submerged) {
-            lc.Surface();
-        }
         transform.position = respawnPoint.transform.position;
         Instantiate(spawnSetEffect, respawnPoint.transform.position, Quaternion.identity);
         // Give time for collision to check
@@ -158,15 +150,15 @@ public class FrogController : MonoBehaviour {
 
     private void SubscribeEvents() {
         GetComponent<Collector>().onCollect += OnCollect;
-        lc.onLand += OnLand;
-        lc.onSink += OnSink;
+        lc.OnLand += OnLand;
+        lc.OnSink += OnSink;
     }
 
     private void OnCollect(GameObject toCollect, string tag) {
         switch (tag) {
             case "Secret":
             case "Fly":
-                AudioSource.PlayClipAtPoint(eatSound, transform.position);
+                asrc.PlayOneShot(eatSound);
                 toCollect.tag = "X";
                 break;
             case "Lily":
@@ -202,7 +194,7 @@ public class FrogController : MonoBehaviour {
 
     void OnDestroy() {
         GetComponent<Collector>().onCollect -= OnCollect;
-        lc.onLand -= OnLand;
-        lc.onSink -= OnSink;
+        lc.OnLand -= OnLand;
+        lc.OnSink -= OnSink;
     }
 }

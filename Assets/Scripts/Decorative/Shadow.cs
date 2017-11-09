@@ -54,10 +54,10 @@ public class Shadow : MonoBehaviour {
 
         overgroundsr.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
 
-        var lc = GetComponent<LandingController>();
+        var lc = GetComponent<LandStateController>();
         if (lc) {
-            lc.onSink += HideOvergroundShadow;
-            lc.onSurface += ShowOvergroundShadow;
+            lc.OnSink += HideOvergroundShadow;
+            lc.OnSurface += ShowOvergroundShadow;
         }
 
         if (shadowContainer) {
@@ -96,10 +96,10 @@ public class Shadow : MonoBehaviour {
         Destroy(underwaterShadow);
         if(overground) {
             Destroy(overgroundShadow);
-            var lc = GetComponent<LandingController>();
+            var lc = GetComponent<LandStateController>();
             if (lc) {
-                lc.onSink -= HideOvergroundShadow;
-                lc.onSurface -= ShowOvergroundShadow;
+                lc.OnSink -= HideOvergroundShadow;
+                lc.OnSurface -= ShowOvergroundShadow;
             }
         }
     }
