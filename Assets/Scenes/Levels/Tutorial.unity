@@ -3697,7 +3697,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 15, y: 15}
+  m_Size: {x: 30, y: 30}
   m_EdgeRadius: 0
 --- !u!1 &1733847475
 GameObject:
@@ -4099,6 +4099,91 @@ Prefab:
     - target: {fileID: 1105622661057686, guid: a35e1e571f2702d4690ae05d84e6ab3d, type: 2}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 120925111336764446, guid: a35e1e571f2702d4690ae05d84e6ab3d,
+        type: 2}
+      propertyPath: m_Positions.Array.data[1].z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 120925111336764446, guid: a35e1e571f2702d4690ae05d84e6ab3d,
+        type: 2}
+      propertyPath: m_Positions.Array.data[1].y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 120925111336764446, guid: a35e1e571f2702d4690ae05d84e6ab3d,
+        type: 2}
+      propertyPath: m_UseWorldSpace
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 120925111336764446, guid: a35e1e571f2702d4690ae05d84e6ab3d,
+        type: 2}
+      propertyPath: m_Parameters.widthMultiplier
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 120925111336764446, guid: a35e1e571f2702d4690ae05d84e6ab3d,
+        type: 2}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 120925111336764446, guid: a35e1e571f2702d4690ae05d84e6ab3d,
+        type: 2}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].time
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 120925111336764446, guid: a35e1e571f2702d4690ae05d84e6ab3d,
+        type: 2}
+      propertyPath: m_Parameters.colorGradient.key0.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 120925111336764446, guid: a35e1e571f2702d4690ae05d84e6ab3d,
+        type: 2}
+      propertyPath: m_Parameters.colorGradient.key0.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 120925111336764446, guid: a35e1e571f2702d4690ae05d84e6ab3d,
+        type: 2}
+      propertyPath: m_Parameters.colorGradient.key0.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 120925111336764446, guid: a35e1e571f2702d4690ae05d84e6ab3d,
+        type: 2}
+      propertyPath: m_ReceiveShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 120925111336764446, guid: a35e1e571f2702d4690ae05d84e6ab3d,
+        type: 2}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+    - target: {fileID: 120925111336764446, guid: a35e1e571f2702d4690ae05d84e6ab3d,
+        type: 2}
+      propertyPath: m_Loop
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 120925111336764446, guid: a35e1e571f2702d4690ae05d84e6ab3d,
+        type: 2}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[1].value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 120925111336764446, guid: a35e1e571f2702d4690ae05d84e6ab3d,
+        type: 2}
+      propertyPath: m_SortingOrder
+      value: 199
+      objectReference: {fileID: 0}
+    - target: {fileID: 120925111336764446, guid: a35e1e571f2702d4690ae05d84e6ab3d,
+        type: 2}
+      propertyPath: m_Parameters.generateLightingData
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 120925111336764446, guid: a35e1e571f2702d4690ae05d84e6ab3d,
+        type: 2}
+      propertyPath: m_DynamicOccludee
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 50784291395671860, guid: a35e1e571f2702d4690ae05d84e6ab3d,
+        type: 2}
+      propertyPath: m_LinearDrag
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a35e1e571f2702d4690ae05d84e6ab3d, type: 2}

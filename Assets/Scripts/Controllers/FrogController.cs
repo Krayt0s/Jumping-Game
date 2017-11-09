@@ -15,6 +15,8 @@ public class FrogController : MonoBehaviour {
     private Animator anim;
     private AudioSource asrc;
     private AudioSource boingAsrc;
+    private LineRenderer jumpCursor;
+    private Vector3[] jumpCursorPositions;
 
     [SerializeField] private AudioClip eatSound;
 
@@ -51,14 +53,22 @@ public class FrogController : MonoBehaviour {
         lc = GetComponent<LandStateController>();
         rb2d = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        jumpCursor = GetComponent<LineRenderer>();
 
         asrc = GetComponent<AudioSource>();
         boingAsrc = gameObject.AddComponent<AudioSource>();
 
         SubscribeEvents();
     }
-	
-	void Update () {
+
+    private void Start() {
+        jumpCursorPositions = new Vector3[] { Vector3.zero, Vector3.zero };
+        jumpCursor.SetPositions(jumpCursorPositions);
+    }
+
+    void Update () {
+        jumpCursorPositions[0] = transform.position;
+
         Rotate();
 
         if (Charging) {
@@ -71,7 +81,10 @@ public class FrogController : MonoBehaviour {
                 if(boingAsrc.isPlaying) {
                     boingAsrc.Stop();
                 }
-                boingAsrc.pitch = Mathf.Lerp(startPitch, endPitch, heldTime / maxHoldTime);
+                float chargeFrac = heldTime / maxHoldTime;
+                jumpCursorPositions[1] = jumpCursorPositions[0] + 
+                    transform.up * maxJumpDistance * chargeFrac;
+                boingAsrc.pitch = Mathf.Lerp(startPitch, endPitch, chargeFrac);
                 boingAsrc.PlayOneShot(chargeSound, volume);
                 heldTime += Time.deltaTime;
                 if (heldTime > maxHoldTime) {
@@ -79,15 +92,19 @@ public class FrogController : MonoBehaviour {
                 }
             }
         } else {
+            if (lc.Grounded) {
+                jumpCursorPositions[1] = jumpCursorPositions[0];
+            }
             if (BeginCharge()) {
                 Charging = true;
             }
         }
 
-        KeepInCameraBounds();
+        jumpCursor.SetPositions(jumpCursorPositions);
+        //KeepInCameraBounds();
     }
 
-    void KeepInCameraBounds() {
+    /*void KeepInCameraBounds() {
         Vector3 vpp = Camera.main.WorldToViewportPoint(transform.position);
         bool oob = vpp.x < 0 || 1 < vpp.x || vpp.y < 0 || 1 < vpp.y || vpp.z < 0;
         if (inBounds && oob) {
@@ -95,7 +112,7 @@ public class FrogController : MonoBehaviour {
             inBounds = false;
         }
         inBounds = !oob;
-    }
+    }*/
 
     private void Uncharge() {
         heldTime = 0;
