@@ -15,11 +15,12 @@ public class Gamebox : MonoBehaviour {
     void OnTriggerExit2D(Collider2D coll) {
         GameObject cullee = coll.gameObject;
         entitiesEntered.Remove(cullee);
-        Despawn(cullee);
-    }
 
-    void Despawn(GameObject gameObject) {
-        // TODO pool spawned objects
-        Destroy(gameObject);
+        var desp = cullee.GetComponent<Despawnable>();
+        if(desp) {
+            desp.despawnFunction.Invoke();
+        } else if(cullee.transform.parent == null) {
+            Destroy(cullee);
+        }
     }
 }
