@@ -15,7 +15,7 @@ public class FrogController : MonoBehaviour {
     private Animator anim;
     private AudioSource asrc;
     private AudioSource boingAsrc;
-    [SerializeField] private JumpCursor jumpCursor;
+    private JumpCursor jumpCursor;
 
     [SerializeField] private AudioClip eatSound;
 
@@ -55,8 +55,12 @@ public class FrogController : MonoBehaviour {
 
         boingAsrc = gameObject.AddComponent<AudioSource>();
 
-        if(jumpCursor) {
-            jumpCursor.SetHomeObject(gameObject);
+        var g = GameObject.FindGameObjectWithTag("Assistant");
+        if(g) {
+            jumpCursor = g.GetComponentInChildren<JumpCursor>();
+            if(jumpCursor) {
+                jumpCursor.SetHomeObject(gameObject);
+            }
         }
 
         SubscribeEvents();
@@ -71,7 +75,9 @@ public class FrogController : MonoBehaviour {
                     Jump();
                 }
                 Uncharge();
-                jumpCursor.StartContraction();
+                if(jumpCursor) {
+                    jumpCursor.Freeze();
+                }
             } else {
                 if(boingAsrc.isPlaying) {
                     boingAsrc.Stop();
@@ -79,7 +85,7 @@ public class FrogController : MonoBehaviour {
                 float chargeFrac = heldTime / maxHoldTime;
                 if(jumpCursor) {
                     Vector3 worldv = (transform.up * jumpVelocity) + (Vector3)rb2d.velocity;
-                    jumpCursor.SetTowardsDisp(worldv * fallTime * chargeFrac);
+                    jumpCursor.Aim(worldv * fallTime * chargeFrac);
                 }
                 boingAsrc.pitch = Mathf.Lerp(startPitch, endPitch, chargeFrac);
                 boingAsrc.PlayOneShot(chargeSound, volume);
@@ -105,6 +111,10 @@ public class FrogController : MonoBehaviour {
             boingAsrc.PlayOneShot(chargeSound, volume);
         }
         Charging = false;
+
+        if (jumpCursor) {
+            jumpCursor.StopAiming();
+        }
     }
 
     private void Jump() {
@@ -123,7 +133,7 @@ public class FrogController : MonoBehaviour {
         // Give time for collision to check
         Invoke("PostRespawn", 0.1f);
         if (jumpCursor) {
-            jumpCursor.EndContraction();
+            jumpCursor.Unfreeze();
         }
     }
     private void PostRespawn() {
@@ -184,7 +194,7 @@ public class FrogController : MonoBehaviour {
         anim.SetTrigger("Land");
         anim.ResetTrigger("Jump");
         if (jumpCursor) {
-            jumpCursor.EndContraction();
+            jumpCursor.Unfreeze();
         }
     }
 
