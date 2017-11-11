@@ -28,7 +28,7 @@ public class LandStateController : MonoBehaviour {
     private State state;
     public bool Airborne { get { return state == State.AIRBORNE; } }
     public bool Grounded { get { return state == State.GROUNDED; } }
-    public bool Submerged { get { return state == State.UNDERWATER; } }
+    public bool Underwater { get { return state == State.UNDERWATER; } }
 
     public delegate void StateChange();
     public event StateChange OnSink;
@@ -64,25 +64,27 @@ public class LandStateController : MonoBehaviour {
     }
 
     public bool CanLand() {
-        if (landObjects.Count == 0) {
-            return false;
-        } else {
-            return true;
+        return landObjects.Count != 0;
+    }
+
+    public bool LandIfCan() {
+        bool canLand = CanLand();
+        if (canLand) {
+            Ground(landObjects[0]);
+            if (OnLand != null) {
+                OnLand();
+            }
         }
+        return canLand;
     }
 
     #region State Entry
     public bool TryLand() {
-        if (CanLand()) {
-            Ground(landObjects[0]);
-            if(OnLand != null) {
-                OnLand();
-            }
-            return true;
-        } else {
+        bool landed = LandIfCan();
+        if (!landed) {
             Sink();
-            return false;
         }
+        return landed;
     }
     private void Ground(GameObject ground) {
         LeaveState();

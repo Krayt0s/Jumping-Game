@@ -15,8 +15,7 @@ public class FrogController : MonoBehaviour {
     private Animator anim;
     private AudioSource asrc;
     private AudioSource boingAsrc;
-    private LineRenderer jumpCursor;
-    private Vector3[] jumpCursorPositions;
+    [SerializeField] private JumpCursor jumpCursor;
 
     [SerializeField] private AudioClip eatSound;
 
@@ -52,22 +51,18 @@ public class FrogController : MonoBehaviour {
         lc = GetComponent<LandStateController>();
         rb2d = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
-        jumpCursor = GetComponent<LineRenderer>();
-
         asrc = GetComponent<AudioSource>();
+
         boingAsrc = gameObject.AddComponent<AudioSource>();
+
+        if(jumpCursor) {
+            jumpCursor.SetHomeObject(gameObject);
+        }
 
         SubscribeEvents();
     }
 
-    private void Start() {
-        jumpCursorPositions = new Vector3[] { Vector3.zero, Vector3.zero };
-        jumpCursor.SetPositions(jumpCursorPositions);
-    }
-
     void Update () {
-        jumpCursorPositions[0] = transform.position;
-
         Rotate();
 
         if (Charging) {
@@ -76,13 +71,16 @@ public class FrogController : MonoBehaviour {
                     Jump();
                 }
                 Uncharge();
+                jumpCursor.StartContraction();
             } else {
                 if(boingAsrc.isPlaying) {
                     boingAsrc.Stop();
                 }
                 float chargeFrac = heldTime / maxHoldTime;
-                jumpCursorPositions[1] = jumpCursorPositions[0] + 
-                    transform.up * maxJumpDistance * chargeFrac;
+                if(jumpCursor) {
+                    Vector3 worldv = (transform.up * jumpVelocity) + (Vector3)rb2d.velocity;
+                    jumpCursor.SetTowardsDisp(worldv * fallTime * chargeFrac);
+                }
                 boingAsrc.pitch = Mathf.Lerp(startPitch, endPitch, chargeFrac);
                 boingAsrc.PlayOneShot(chargeSound, volume);
                 heldTime += Time.deltaTime;
@@ -91,15 +89,10 @@ public class FrogController : MonoBehaviour {
                 }
             }
         } else {
-            if (lc.Grounded) {
-                jumpCursorPositions[1] = jumpCursorPositions[0];
-            }
             if (BeginCharge()) {
                 Charging = true;
             }
         }
-
-        jumpCursor.SetPositions(jumpCursorPositions);
     }
 
     private void Uncharge() {
@@ -115,8 +108,7 @@ public class FrogController : MonoBehaviour {
     }
 
     private void Jump() {
-        rb2d.velocity = ChargeRatio * jumpVelocity * (Vector2)transform.up 
-                        + rb2d.velocity * (lc.Grounded? 1 : 0);
+        rb2d.velocity = ChargeRatio * jumpVelocity * (Vector2)transform.up + rb2d.velocity;
         lc.Ascend(fallTime);
         anim.SetTrigger("Jump");
     }
@@ -130,6 +122,9 @@ public class FrogController : MonoBehaviour {
         Instantiate(spawnSetEffect, respawnPoint.transform.position, Quaternion.identity);
         // Give time for collision to check
         Invoke("PostRespawn", 0.1f);
+        if (jumpCursor) {
+            jumpCursor.EndContraction();
+        }
     }
     private void PostRespawn() {
         lc.TryLand();
@@ -188,6 +183,9 @@ public class FrogController : MonoBehaviour {
     private void OnLand() {
         anim.SetTrigger("Land");
         anim.ResetTrigger("Jump");
+        if (jumpCursor) {
+            jumpCursor.EndContraction();
+        }
     }
 
     private void OnSink() {

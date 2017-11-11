@@ -8,6 +8,7 @@ TagManager:
   - X
   - Secret
   - Lily
+  - Assistant
   layers:
   - Default
   - TransparentFX
