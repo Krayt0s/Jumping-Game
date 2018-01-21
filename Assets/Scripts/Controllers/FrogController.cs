@@ -24,11 +24,11 @@ public class FrogController : MonoBehaviour {
     private float endPitch = 2.5f;
     private float volume = 0.6f;
 
-    [SerializeField] private float maxJumpDistance = 8.0f;
-    [SerializeField] private float fallTime = 0.3f;
+    private float maxJumpVelocity = 30.0f;
+    private float baseJumpVelocity = 12.0f;
+    private float maxJumpDistance = 7.0f;
 
     private bool _charging;
-    private float jumpVelocity;
     private float heldTime;
     private const float maxHoldTime = 1.5f;
     public float ChargeRatio { get { return (heldTime / maxHoldTime); } }
@@ -47,7 +47,6 @@ public class FrogController : MonoBehaviour {
 
     void Awake() {
         heldTime = 0f;
-        jumpVelocity = maxJumpDistance / fallTime;
         lc = GetComponent<LandStateController>();
         rb2d = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
@@ -67,31 +66,40 @@ public class FrogController : MonoBehaviour {
     }
 
     void Update () {
-        Rotate();
+        Vector2 target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        RotateTo(target);
+        // Limit jump distance
+        Vector3 dir = target - (Vector2)transform.position;
+        if(dir.magnitude > maxJumpDistance) {
+            target = dir.normalized * maxJumpDistance + transform.position;
+        }
 
         if (Charging) {
+            float chargeFrac = heldTime / maxHoldTime;
+
             if (ReleaseCharge()) {
                 if (lc.Grounded || (lc.Airborne && lc.CanLand())) {
-                    Jump();
+                    jumpCursor.Aim(JumpDisp(target, chargeFrac));
+                    Jump(target, JumpVelocity(chargeFrac));
                 }
-                Uncharge();
+                BreakCharge();
                 if(jumpCursor) {
                     jumpCursor.Freeze();
                 }
             } else {
+                if(jumpCursor) {
+                    jumpCursor.Aim(JumpDisp(target, chargeFrac));
+                }
+                // Update sound
                 if(boingAsrc.isPlaying) {
                     boingAsrc.Stop();
                 }
-                float chargeFrac = heldTime / maxHoldTime;
-                if(jumpCursor) {
-                    Vector3 worldv = (transform.up * jumpVelocity) + (Vector3)rb2d.velocity;
-                    jumpCursor.Aim(worldv * fallTime * chargeFrac);
-                }
                 boingAsrc.pitch = Mathf.Lerp(startPitch, endPitch, chargeFrac);
                 boingAsrc.PlayOneShot(chargeSound, volume);
+                // Update Charging Progress
                 heldTime += Time.deltaTime;
                 if (heldTime > maxHoldTime) {
-                    Uncharge();
+                    BreakCharge();
                 }
             }
         } else {
@@ -101,7 +109,7 @@ public class FrogController : MonoBehaviour {
         }
     }
 
-    private void Uncharge() {
+    private void BreakCharge() {
         heldTime = 0;
         if(Charging) {
             if (boingAsrc.isPlaying) {
@@ -117,14 +125,29 @@ public class FrogController : MonoBehaviour {
         }
     }
 
-    private void Jump() {
-        rb2d.velocity = ChargeRatio * jumpVelocity * (Vector2)transform.up + rb2d.velocity;
-        lc.Ascend(fallTime);
+    private Vector2 JumpDisp(Vector2 target, float chargeFrac) {
+        // Predict landing position
+        Vector3 dir = (target - (Vector2)transform.position).normalized;
+        Vector3 worldv = (dir * JumpVelocity(chargeFrac)) + (Vector3)rb2d.velocity;
+        return worldv * FallTime(target, JumpVelocity(chargeFrac));
+    }
+
+    private void Jump(Vector2 target, float jumpVelocity) {
+        rb2d.velocity = jumpVelocity * (Vector2)transform.up + rb2d.velocity;
+        lc.Ascend(FallTime(target, jumpVelocity));
         anim.SetTrigger("Jump");
     }
 
+    private float JumpVelocity(float chargeFrac) {
+        return Mathf.Lerp(baseJumpVelocity, maxJumpVelocity, chargeFrac);
+    }
+
+    private float FallTime(Vector2 target, float jumpVelocity) {
+        return (target - (Vector2)(transform.position)).magnitude / jumpVelocity;
+    }
+
     void OnCollisionEnter2D(Collision2D coll) {
-        Uncharge();
+        BreakCharge();
     }
 
     public void Respawn() {
@@ -133,7 +156,7 @@ public class FrogController : MonoBehaviour {
         // Give time for collision to check
         Invoke("PostRespawn", 0.1f);
         if (jumpCursor) {
-            jumpCursor.Unfreeze();
+            jumpCursor.Deaim();
         }
     }
     private void PostRespawn() {
@@ -142,8 +165,8 @@ public class FrogController : MonoBehaviour {
 
     #region Control Implementation
 
-    private void Rotate() {
-        Vector3 dir = Input.mousePosition - Camera.main.WorldToScreenPoint(transform.position);
+    private void RotateTo(Vector3 target) {
+        Vector3 dir = target - transform.position;
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.AngleAxis(angle - 90, Vector3.forward);
     }
@@ -194,7 +217,7 @@ public class FrogController : MonoBehaviour {
         anim.SetTrigger("Land");
         anim.ResetTrigger("Jump");
         if (jumpCursor) {
-            jumpCursor.Unfreeze();
+            jumpCursor.Deaim();
         }
     }
 

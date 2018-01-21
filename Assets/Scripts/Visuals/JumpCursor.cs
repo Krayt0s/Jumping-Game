@@ -29,6 +29,10 @@ public class JumpCursor : MonoBehaviour {
 
     public void Unfreeze() {
         frozen = false;
+    }
+
+    public void Deaim() {
+        Unfreeze();
         jumpCursorPositions[0] = jumpCursorPositions[1] = home.transform.position;
     }
 
@@ -41,6 +45,9 @@ public class JumpCursor : MonoBehaviour {
 	}
 
     public void Aim(Vector3 disp) {
+        if(frozen) {
+            return;
+        }
         aiming = true;
         jumpCursorPositions[1] = jumpCursorPositions[0] + disp;
     }
