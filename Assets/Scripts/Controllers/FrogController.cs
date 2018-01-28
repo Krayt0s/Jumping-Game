@@ -136,6 +136,11 @@ public class FrogController : MonoBehaviour {
         rb2d.velocity = jumpVelocity * (Vector2)transform.up + rb2d.velocity;
         lc.Ascend(FallTime(target, jumpVelocity));
         anim.SetTrigger("Jump");
+
+        // Newton's 3rd Law
+        if(lc.Grounded) {
+            lc.Grounding.attachedRigidbody.AddForce(-rb2d.velocity * rb2d.mass, ForceMode2D.Impulse);
+        }
     }
 
     private float JumpVelocity(float chargeFrac) {

@@ -37,6 +37,7 @@ SpriteAtlas:
   - {fileID: 21300000, guid: da43d28c90d1af84985fb8ddae193aff, type: 3}
   - {fileID: 21300000, guid: 725d406c3c8ccd343aff2799f66ac240, type: 3}
   - {fileID: 21300000, guid: 2e6314cc3db7c7c49bb50df933c873c7, type: 3}
+  - {fileID: 21300004, guid: 2e6314cc3db7c7c49bb50df933c873c7, type: 3}
   - {fileID: 21300000, guid: 1842656c5695c1149ac6d689952a46ab, type: 3}
   - {fileID: 21300004, guid: 045c84d01f2df724cbf97c7b348a0f43, type: 3}
   - {fileID: 21300000, guid: 86ed1c7f1388dd7499d67eff6b26cc84, type: 3}
@@ -49,6 +50,7 @@ SpriteAtlas:
   - Branch
   - Cloud
   - lilypad
+  - rock
   - Treetop
   - frog_jump
   - log

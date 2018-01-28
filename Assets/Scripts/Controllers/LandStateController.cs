@@ -21,6 +21,7 @@ public class LandStateController : MonoBehaviour {
     [SerializeField] private AudioClip splashSound;
 
     private AnchoredJoint2D grounding;
+    public AnchoredJoint2D Grounding { get { return grounding; } } 
     private List<GameObject> landObjects = new List<GameObject>();
 
     private float fallTimer;
@@ -91,10 +92,12 @@ public class LandStateController : MonoBehaviour {
         grounding = ground.AddComponent<HingeJoint2D>();
         grounding.autoConfigureConnectedAnchor = true;
         Quaternion invrot = Quaternion.Inverse(ground.transform.rotation);
-        grounding.anchor = invrot * ((transform.position + (Vector3)anchorPoint) - ground.transform.position);
+        grounding.anchor = invrot * (transform.position - ground.transform.position);
         grounding.connectedBody = rb2d;
         grounding.enableCollision = true;
         state = State.GROUNDED;
+
+        anchorPoint = grounding.anchor;
     }
 
     public void Sink() {
